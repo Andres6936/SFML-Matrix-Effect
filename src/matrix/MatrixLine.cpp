@@ -3,86 +3,66 @@
 #include "Symbol.h"
 #include "../utils/Random.h"
 
-#include <iostream>
-
-int MatrixLine::s_char_pos_offset = 0;
-int MatrixLine::s_char_size = 18;
-int MatrixLine::s_HEIGHT;
-
-int get_simbol_length()
+MatrixLine::MatrixLine(int xOffset, unsigned charSize, unsigned symBufferSize, MatrixConfig& config, sf::Font& font)
+	: m_Config(&config),
+	  m_font(font),
+	  m_SymbolCount(RandomSymbolCount()),
+	  m_xOffset(xOffset),
+	  m_ySpeed(RandomSpeed())
 {
-    return Random::get().getInt(10, 50);
+	/*
+	 * To avoid doing allocations while rendering
+	 * preallocated vector is used to reuse symbols.
+	 * resize created a bug with the rng
+	 */
+	m_Symbols.reserve(symBufferSize);
+
+	int i = 0;
+	while (i++ < symBufferSize)
+	{
+		m_Symbols.emplace_back(config, font);
+	}
+
+	NewLine(m_SymbolCount, 0);
 }
 
-float get_step()
+void MatrixLine::NewLine(int count, int offset)
 {
-    return Random::get().getFloat(3, 6);
+	m_SymbolCount = count;
+
+	m_Offset = 1.f * (count * m_Config->CharSize) + offset;
+
+	for (int i = 0; i < m_SymbolCount; i++)
+	{
+		m_Symbols[i].SetFirst(i == m_SymbolCount - 1);
+
+		m_Symbols[i].SetPosition(
+			(m_xOffset * m_Config->CharSize),
+			(i * m_Config->CharSize - m_Offset)
+		);
+
+		m_Symbols[i].SetDuration(RandomDuration());
+	}
 }
 
-void MatrixLine::setHeight(int height)
-{ 
-    MatrixLine::s_HEIGHT = height;
-}
-
-MatrixLine::MatrixLine() {
-    m_font = sf::Font();
-}
-
-MatrixLine::MatrixLine(int x, sf::Font& font)
-:   m_step(get_step()),
-    m_symbols_size(get_simbol_length()),
-    m_row(x),
-    m_font(font)
+/*
+ * Since all lines are independent
+ * update and draw can happen one after the other on the same line.
+ */
+void MatrixLine::UpdateDraw(sf::RenderWindow& window, float dt)
 {
-    Symbol::s_size = s_char_size;
-    create_line(m_symbols_size, 0);
-}
+	if (m_Y > m_Config->Height + m_Offset)
+	{
+		m_Y = 0;
+		m_ySpeed = RandomSpeed();
+		_newline();
+	}
 
-// The worst variable naming scheme
-void MatrixLine::create_line(int size, int offset)
-{
-    m_symbols_size = size;
-    m_symbols = new Symbol[size];
-    m_offset = 1.f * (size * s_char_size) + offset;
-    float x = (m_row * (s_char_size - s_char_pos_offset));
-    
-    for (int i = 0; i < size; i++)
-    {
-        float y = ((i * s_char_size) - m_offset) - s_char_pos_offset;
-        float duration = 10 * Random::get().getFloat(1, 10);
-        m_symbols[i] = Symbol(m_font, x, y, duration, i == size - 1);
-    }
-}
+	for (int count = 0; count < m_SymbolCount; count++)
+	{
+		m_Symbols[count].Update(m_ySpeed, dt);
+		m_Symbols[count].Draw(window);
+	}
 
-void MatrixLine::update_draw(sf::RenderWindow& window)
-{
-    if (m_y > s_HEIGHT + m_offset)
-    {
-        m_y = 0;   
-        purge_symbols();
-        m_step = get_step();
-        create_line(
-            get_simbol_length(),
-            Random::get().getInt(4, 10) * m_symbols_size
-        );
-    }
-
-    for (int i = 0; i < m_symbols_size; i++)
-    {
-        m_symbols[i].update(m_step);
-        m_symbols[i].draw(window);
-    }
-
-    m_y += m_step;
-}
-
-void MatrixLine::set_char_size(int s)
-{
-    Symbol::s_size = s;
-    MatrixLine::s_char_size = s;
-}
-
-void MatrixLine::purge_symbols()
-{
-    delete [] m_symbols;
+	m_Y += m_ySpeed * dt;
 }

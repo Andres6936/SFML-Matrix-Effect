@@ -1,16 +1,15 @@
 #pragma once
-
-#include "MatrixLine.h"
 #include <SFML/Graphics.hpp>
+#include "MatrixConfig.h"
+#include "MatrixLine.h"
 
 class Matrix
 {
-    private:
-        MatrixLine **m_lines;
-        int m_line_count;
+public:
+	Matrix(MatrixConfig& config, sf::Font& font);
 
-    public:
-        Matrix(int width, int height, sf::Font& font);
-
-        void update_draw(sf::RenderWindow& window);
+	void UpdateDraw(sf::RenderWindow& window, float dt);
+private:
+	MatrixConfig* m_Config;
+	std::vector<MatrixLine> m_Lines;
 };

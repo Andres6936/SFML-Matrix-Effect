@@ -1,31 +1,25 @@
-#include <iostream>
 #include <SFML/Graphics.hpp>
 
 #include "Matrix.h"
 #include "MatrixLine.h"
-const int CHAR_SIZE = 18;
 
-Matrix::Matrix(int width, int height, sf::Font& font)
+Matrix::Matrix(MatrixConfig& config, sf::Font& font)
+	: m_Config(&config)
 {
-    MatrixLine::setHeight(height);
-    MatrixLine::set_char_size(CHAR_SIZE);
-    
-    m_line_count = width / (CHAR_SIZE - 1);
+	int lineCount = m_Config->Width / (m_Config->CharSize - 1);
 
-    m_lines = new MatrixLine*[m_line_count];
+	m_Lines.reserve(lineCount);
 
-    for(int i = 0; i < m_line_count; i++)
-    {
-        m_lines[i] = new MatrixLine(i, font);
-    }
-
+	for (int i = 0; i < lineCount; i++)
+	{
+		m_Lines.emplace_back(i, m_Config->CharSize, m_Config->MaxLineSymbolCount, config, font);
+	}
 }
 
-void Matrix::update_draw(sf::RenderWindow& window)
+void Matrix::UpdateDraw(sf::RenderWindow& window, float dt)
 {
-    
-    for(int i = 0; i < m_line_count; i++)
-    {
-        m_lines[i]->update_draw(window);
-    }
+	for (auto& line : m_Lines)
+	{
+		line.UpdateDraw(window, dt);
+	}
 }

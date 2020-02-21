@@ -1,32 +1,46 @@
 #pragma once
 
 #include <SFML/Graphics.hpp>
+#include "MatrixConfig.h"
+#include "../utils/Math.h"
+#include "../utils/Random.h"
 
 class Symbol
 {
-    private:
-        sf::Text m_text;
-        float m_step;
-        float m_x;
-        float m_y;
-        sf::Color m_clr;
-        bool m_isfirst;
-        float m_duration;
-        float m_current_timestamp{0};
-        static sf::Color s_clr;
-        static sf::Color s_first_clr;
+public:
+	Symbol();
+	Symbol(MatrixConfig& config, sf::Font& font);
 
-    public:
-        static int s_size;
-        
-        Symbol();
-        Symbol(sf::Font& font, float x, float offset_y, float duration, bool isfirst);
+	void Update(float ySpeed, float dt);
+	void SetFirst(bool first);
+	void SetPosition(sf::Vector2f& pos);
+	void SetPosition(float x, float y);
+	void SetDuration(float d);
 
-        void newchar();
+	void Draw(sf::RenderTarget& target) const;
+private:
+	MatrixConfig* m_Config;
+	sf::Text m_Text;
+	sf::Vector2f m_Pos;
+	sf::Color m_Clr;
+	bool m_First{false};
+	float m_Dur;
+	float m_CurrentTimeStep{0};
 
-        void update_clr();
+	void _RefreshSymbol()
+	{
+		// 0x30A0 is the start of the unicode katakata chars
+		wchar_t c = 0x30A0 + Random::get().getInt(1, 95);
 
-        void update(float step);
+		m_Text.setString(c);
 
-        void draw(sf::RenderWindow& window);
+		m_Clr = m_Config->ActiveTextColor;
+	}
+
+	void _UpdateClr()
+	{
+		m_Clr.r = LinearTranslate(0.f, m_Dur, m_Clr.r, m_Config->TextColor.r, m_CurrentTimeStep);
+		m_Clr.g = LinearTranslate(0.f, m_Dur, m_Clr.g, m_Config->TextColor.g, m_CurrentTimeStep);
+		m_Clr.b = LinearTranslate(0.f, m_Dur, m_Clr.b, m_Config->TextColor.b, m_CurrentTimeStep);
+	}
 };

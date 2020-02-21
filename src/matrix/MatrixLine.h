@@ -1,33 +1,55 @@
-#pragma once 
+#pragma once
 
 #include "Symbol.h"
 #include <SFML/Graphics.hpp>
+#include "../utils/Random.h"
+#include "MatrixConfig.h"
 
 class MatrixLine
 {
-    private:
-         // sf::Font It should be a reference but had an error with the "=" operator and got away with the quick and dirty method
-        sf::Font m_font; 
-        float m_row;
-        float m_y{0};
-        float m_offset{0};
-        float m_step;
-        Symbol *m_symbols;
-        int m_symbols_size;
+public:
+	MatrixLine(int xOffset, unsigned charSize, unsigned symBufferSize, MatrixConfig& config, sf::Font& font);
+	void NewLine(int count, int offset);
+	void UpdateDraw(sf::RenderWindow& window, float dt);
+private:
+	MatrixConfig* m_Config;
+	sf::Font& m_font;
+	std::vector<Symbol> m_Symbols;
+	int m_SymbolCount;
+	float m_xOffset;
+	float m_Y{0};
+	float m_ySpeed;
+	float m_Offset{0};
 
-        void create_line(int size, int offset);
-        void purge_symbols();
+	float RandomDuration()
+	{
+		return Random::get().getFloat(
+			m_Config->MinSymbolDuration,
+			m_Config->MaxSymbolDuration
+		);
+	}
 
-    public:
-        static int s_char_pos_offset;
-        static int s_char_size;
-        static int s_HEIGHT;
+	int RandomSymbolCount()
+	{
+		return Random::get().getInt(
+			m_Config->MinLineSymbolCount,
+			m_Config->MaxLineSymbolCount
+		);
+	}
 
-        MatrixLine();
-        MatrixLine(int x, sf::Font& font);
+	float RandomSpeed()
+	{
+		return Random::get().getFloat(
+			m_Config->MinFallSpeed,
+			m_Config->MaxFallSpeed
+		);
+	}
 
-        static void setHeight(int height);
-        static void set_char_size(int s);
-
-        void update_draw(sf::RenderWindow& window);
+	void _newline()
+	{
+		NewLine(
+			RandomSymbolCount(),
+			RandomSymbolCount()
+		);
+	}
 };
