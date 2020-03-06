@@ -2,8 +2,8 @@
 
 #include <SFML/Graphics.hpp>
 #include "MatrixConfig.h"
-#include "../utils/Math.h"
-#include "../utils/Random.h"
+#include "Math.h"
+#include "Random.h"
 
 class Symbol
 {
@@ -39,8 +39,8 @@ private:
 
 	void _UpdateClr()
 	{
-		m_Clr.r = LinearTranslate(0.f, m_Dur, m_Clr.r, m_Config->TextColor.r, m_CurrentTimeStep);
-		m_Clr.g = LinearTranslate(0.f, m_Dur, m_Clr.g, m_Config->TextColor.g, m_CurrentTimeStep);
-		m_Clr.b = LinearTranslate(0.f, m_Dur, m_Clr.b, m_Config->TextColor.b, m_CurrentTimeStep);
+		m_Clr.r = LinearTranslate(0.0f, m_Dur, m_Clr.r, m_Config->TextColor.r, m_CurrentTimeStep * m_Config->ColorFalloffFactor);
+		m_Clr.g = LinearTranslate(0.0f, m_Dur, m_Clr.g, m_Config->TextColor.g, m_CurrentTimeStep * m_Config->ColorFalloffFactor);
+		m_Clr.b = LinearTranslate(0.0f, m_Dur, m_Clr.b, m_Config->TextColor.b, m_CurrentTimeStep * m_Config->ColorFalloffFactor);
 	}
 };

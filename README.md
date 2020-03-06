@@ -25,6 +25,7 @@ Simple simulation of the classic matrix screen.
     [int, int, int] BackgroundColor
     [int, int, int] TextColor
     [int, int, int] ActiveTextColor
+    [float] ColorFalloffFactor                    Adjusts the rate at which color fades away
     
 ### Example
     VerticalSync = 0

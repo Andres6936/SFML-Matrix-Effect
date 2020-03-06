@@ -1,9 +1,8 @@
 #include "MatrixLine.h"
 
 #include "Symbol.h"
-#include "../utils/Random.h"
 
-MatrixLine::MatrixLine(int xOffset, unsigned charSize, unsigned symBufferSize, MatrixConfig& config, sf::Font& font)
+MatrixLine::MatrixLine(int xOffset, MatrixConfig& config, sf::Font& font)
 	: m_Config(&config),
 	  m_font(font),
 	  m_SymbolCount(RandomSymbolCount()),
@@ -15,10 +14,10 @@ MatrixLine::MatrixLine(int xOffset, unsigned charSize, unsigned symBufferSize, M
 	 * preallocated vector is used to reuse symbols.
 	 * resize created a bug with the rng
 	 */
-	m_Symbols.reserve(symBufferSize);
+	m_Symbols.reserve(m_Config->MaxLineSymbolCount);
 
 	int i = 0;
-	while (i++ < symBufferSize)
+	while (i++ < m_Config->MaxLineSymbolCount)
 	{
 		m_Symbols.emplace_back(config, font);
 	}
@@ -49,7 +48,7 @@ void MatrixLine::NewLine(int count, int offset)
  * Since all lines are independent
  * update and draw can happen one after the other on the same line.
  */
-void MatrixLine::UpdateDraw(sf::RenderWindow& window, float dt)
+void MatrixLine::Update(float dt)
 {
 	if (m_Y > m_Config->Height + m_Offset)
 	{
@@ -60,9 +59,17 @@ void MatrixLine::UpdateDraw(sf::RenderWindow& window, float dt)
 
 	for (int count = 0; count < m_SymbolCount; count++)
 	{
+		
 		m_Symbols[count].Update(m_ySpeed, dt);
-		m_Symbols[count].Draw(window);
 	}
 
 	m_Y += m_ySpeed * dt;
+}
+
+void MatrixLine::Draw(sf::RenderWindow& window)
+{
+	for (int count = 0; count < m_SymbolCount; count++)
+	{
+		m_Symbols[count].Draw(window);
+	}
 }

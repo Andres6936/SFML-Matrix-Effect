@@ -56,6 +56,12 @@ public:
 					trim(tokens[1]);
 					trim(tokens[2]);
 
+					if (tokens[0].empty() || tokens[1].empty() || tokens[2].empty())
+					{
+						std::cerr << "Invalid property: " << entry->second << "\n";
+						std::exit(-1);
+					}
+
 					return std::make_tuple(sf::Color(
 						std::stoi(tokens[0]),
 						std::stoi(tokens[1]),
@@ -93,7 +99,7 @@ private:
 	bool m_IsValid { false };
 	unordered_map<string, string> m_Map;
 	void _parseLine(string& line);
-
+	
 	static std::vector<std::string> _strsplit(const string& input, const string& regex) {
 		std::regex re(regex);
 		std::sregex_token_iterator
@@ -105,13 +111,13 @@ private:
 	static void ltrim(std::string& s) {
 		s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](int ch) {
 			return !std::isspace(ch);
-			}));
+		}));
 	}
 
 	static void rtrim(std::string& s) {
 		s.erase(std::find_if(s.rbegin(), s.rend(), [](int ch) {
 			return !std::isspace(ch);
-			}).base(), s.end());
+		}).base(), s.end());
 	}
 
 	static void trim(std::string& s) {

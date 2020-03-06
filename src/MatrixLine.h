@@ -2,15 +2,17 @@
 
 #include "Symbol.h"
 #include <SFML/Graphics.hpp>
-#include "../utils/Random.h"
+#include "Random.h"
 #include "MatrixConfig.h"
+#include <mutex>
 
 class MatrixLine
 {
 public:
-	MatrixLine(int xOffset, unsigned charSize, unsigned symBufferSize, MatrixConfig& config, sf::Font& font);
+	MatrixLine(int xOffset, MatrixConfig& config, sf::Font& font);
 	void NewLine(int count, int offset);
-	void UpdateDraw(sf::RenderWindow& window, float dt);
+	void Update(float dt);
+	void Draw(sf::RenderWindow& window);
 private:
 	MatrixConfig* m_Config;
 	sf::Font& m_font;
@@ -21,7 +23,7 @@ private:
 	float m_ySpeed;
 	float m_Offset{0};
 
-	float RandomDuration()
+	float RandomDuration() const
 	{
 		return Random::get().getFloat(
 			m_Config->MinSymbolDuration,
@@ -29,7 +31,7 @@ private:
 		);
 	}
 
-	int RandomSymbolCount()
+	int RandomSymbolCount() const
 	{
 		return Random::get().getInt(
 			m_Config->MinLineSymbolCount,
@@ -37,7 +39,7 @@ private:
 		);
 	}
 
-	float RandomSpeed()
+	float RandomSpeed() const
 	{
 		return Random::get().getFloat(
 			m_Config->MinFallSpeed,

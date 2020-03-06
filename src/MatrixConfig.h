@@ -15,6 +15,7 @@ struct MatrixConfig
 	float MinFallSpeed;
 	float MaxFallSpeed;
 	int TimeStep;
+	float ColorFalloffFactor;
 	sf::Color BackgroundColor;
 	sf::Color TextColor;
 	sf::Color ActiveTextColor;

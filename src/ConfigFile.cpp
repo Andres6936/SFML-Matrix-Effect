@@ -21,11 +21,11 @@ void ConfigFile::Refresh()
 		std::cerr << "Cannot open: " << m_FilePath;
 	}
 	
-	m_IsValid = true;
-	
 	std::string line;
 
 	while (std::getline(file, line)) _parseLine(line);
+
+	m_IsValid = true;
 	
 	file.close();
 }
@@ -49,17 +49,14 @@ void ConfigFile::_parseLine(string& line)
 		std::exit(-1);
 	}
 
+	if (tokens[0].empty() || tokens[1].empty())
+	{
+		std::cerr << "Invalid property: " << line << "\n";
+		std::exit(-1);
+	}
+
 	trim(tokens[0]);
 	trim(tokens[1]);
-
-	if (tokens[0].size() == 0 || tokens[1].size() == 0)
-	{
-		if (tokens.size() != 2)
-		{
-			std::cerr << "Invalid property: " << line << "\n";
-			std::exit(-1);
-		}
-	}
 
 	m_Map[tokens[0]] = tokens[1];
 }
