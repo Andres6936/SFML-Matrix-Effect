@@ -12,7 +12,7 @@ Simple simulation of the classic matrix screen.
 
 ## Config file
 ### Properties:
-    [int] CharSiz			        Symbol/Char size
+    [int] CharSize			        Symbol/Char size
     [int] VerticalSync		        Vsync on/off (1/0)
     [int] FrameRate			        Lock the frame rate, 0 for off
     [float] MinSymbolDuration	        Mininum time for the lifespan of a symbol 
